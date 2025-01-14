@@ -28,14 +28,10 @@ def workday_scrape(site):
 
     email_field_id = "input-4"
     password_field_id = "input-5"
-    sign_in_button_class = "css-1s1r74k"
-    location_class = "css-iov7m8"
+
     # firefox_service = Service(r"C:\Users\jstaf\Documents\geckodriver\geckodriver.exe")
     browser.get(URL)
 
-    account_settings_button_id = "accountSettingsButton"
-    search_tab_class = "css-1t3kk9u"
-    nav_class = "css-l0fptr"
     # pause for username & password entry
     time.sleep(3)
     # elem = browser.find_element(By.NAME, "email")
