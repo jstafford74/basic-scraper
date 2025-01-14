@@ -29,10 +29,13 @@ def workday_scrape(site):
     email_field_id = "input-4"
     password_field_id = "input-5"
     sign_in_button_class = "css-1s1r74k"
+    location_class = "css-iov7m8"
     # firefox_service = Service(r"C:\Users\jstaf\Documents\geckodriver\geckodriver.exe")
     browser.get(URL)
 
     account_settings_button_id = "accountSettingsButton"
+    search_tab_class = "css-1t3kk9u"
+    nav_class = "css-l0fptr"
     # pause for username & password entry
     time.sleep(3)
     # elem = browser.find_element(By.NAME, "email")
@@ -61,6 +64,54 @@ def workday_scrape(site):
         print(Exception)
     finally:
         print("logged in")
+
+    try:
+        time.sleep(5)
+        # button_elements = WebDriverWait(browser, 10).until(
+        #     EC.presence_of_element_located(By.TAG_NAME, "button")
+        # )
+        button_elements = browser.find_elements(By.TAG_NAME, "button")
+        submit_button = None
+        for button in button_elements:
+            if button.text == "Search for Jobs":
+                submit_button = button
+                continue
+
+        time.sleep(2)
+        submit_button.click()
+    finally:
+        print("clicked on search tab")
+
+    try:
+        time.sleep(5)
+        # filter_button_elements = WebDriverWait(browser, 10).until(
+        #     EC.presence_of_element_located((By.TAG_NAME, "button"))
+        # )
+
+        filter_button_elements = browser.find_elements(By.TAG_NAME, "button")
+        location_button = None
+
+        for button in filter_button_elements:
+            if button.text == "Distance or Location":
+                location_button = button
+                continue
+
+        time.sleep(1)
+        location_button.click()
+
+    finally:
+        print("clicked on location selection")
+
+    try:
+        # location_checkbox = WebDriverWait(browser, 10).until(
+        #     EC.presence_of_element_located((By.id, "location"))
+        # )
+        time.sleep(2)
+        location_checkbox = browser.find_element(By.ID, "location")
+        print(location_checkbox)
+        location_checkbox.click()
+    finally:
+        print("clicked on location")
 
 
 workday_scrape("WORKDAY")
