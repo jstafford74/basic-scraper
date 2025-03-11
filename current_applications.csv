@@ -1,0 +1,45 @@
+employer_name,job_title,job_req_id,status,date_submitted,is_active
+Capital One,"Principal Associate, Data Science",R208520,In Progress - Candidate Review,"March 10, 2025",True
+Capital One,"Director, Technical Program Management - Finance Technology",R209237,In Progress - Candidate Review,"March 10, 2025",True
+Capital One,"Manager, Product Management: Premium Products & Experiences",R209888,In Progress - Candidate Review,"March 10, 2025",True
+Mitsubishi Bank,"Sr Software Engineer (C#, Java, Python), Assistant Vice President",10064552-WD,Under Consideration,"January 13, 2025",True
+Mitsubishi Bank,Software Engineer - AVP,10068307-WD,Under Consideration,"January 13, 2025",True
+TD Bank,"TD Epoch-Client Relationship Associate II-NYC, NY",R_1398667,Application Received,"March 10, 2025",True
+TD Bank,"Director - Business Management - Corporate & Investment Banking, TD Securities",R_1404725,Application Received,"March 10, 2025",True
+TD Bank,Group Risk Specialist (US) ORM Wealth and Asset Management,R_1384039,Application Received,"March 10, 2025",True
+TD Bank,VP - Tech Solutions TDS (US),R_1400361,Application Received,"March 7, 2025",True
+TD Bank,"Business Management Specialist - New York, NY",R_1399245,Application Received,"March 7, 2025",True
+TD Bank,"Manager, Group Risk - US",R_1394786,Application Received,"January 23, 2025",True
+TD Bank,US Head of Fixed Income Surveillance (Director),R_1394390,Application Received,"January 23, 2025",True
+TD Bank,US Head of Exchange Traded Products Surveillance (Director),R_1394416,Application Received,"January 23, 2025",True
+TD Bank,Treasury Liquidity Manager,R_1390778,Application Received,"January 13, 2025",True
+Bank of America,"Commodities, Business Controls Officer",25008473,Application Submitted,"March 10, 2025",True
+Bank of America,Credit Risk Manager,24023932,Application Submitted,"March 10, 2025",True
+Bank of America,"Director, Client Solutions - Futures & Options",25008642,Application Submitted,"March 10, 2025",True
+Bank of America,Associate - Trading,25002487,Application Submitted,"January 28, 2025",True
+Bank of America,Alternative Investment Business Development Executive,24046542,Application Submitted,"January 13, 2025",True
+Bank of America,Director / Senior Trading Strategist I,24049190,Application Submitted,"January 2, 2025",True
+Wells Fargo,New York Generalist Sales,R-441941,Review,"March 10, 2025",True
+Wells Fargo,Markets Leadership and Development Specialist,R-440862,Review,"March 10, 2025",True
+Wells Fargo,Rates Lead Specialty Software Engineer,R-435667,Review,"March 10, 2025",True
+Wells Fargo,CIB Innovation - GenAI Product Lead,R-428320,Review,"March 10, 2025",True
+Wells Fargo,Senior Software Engineer - Java Full Stack,R-396196,Review,"December 18, 2024",True
+Synchrony,"VP, Portfolio Credit - Home & Auto",2500608,Under Review,"March 10, 2025",True
+Mizuho,Electronic Trading Sr. Java Developer,R5648,In Progress,"February 11, 2025",True
+Mizuho,Lead Credit Risk Business Analyst and Data Analyst,R5712,In Progress,"January 14, 2025",True
+Northern Trust,"Alternatives Data Product Owner, Asset Management",R138034,In Progress,"March 10, 2025",True
+Northern Trust,"Consultant, Product Control, Hedge Fund Service",R135743,In Progress,"March 10, 2025",True
+Northern Trust,Investment Specialist - Fixed Income,R137357,In Progress,"March 10, 2025",True
+Northern Trust,"Data & Technology Enablement, Oversight and Challenge Lead",R133682,In Progress,"January 14, 2025",True
+Santander,"USA Director, Counterparty Credit Risk",Req1395007,In Progress,"January 14, 2025",True
+Santander,Market Risk Valuation & Market Surveillance– Associate / VP,Req1356074,In Progress,"December 17, 2024",True
+US Bank,High Value Sales - Business Development Manager,2024-0025268,Under Consideration,"March 10, 2025",True
+US Bank,ETF Client Service Manager,2025-0003140,Under Consideration,"March 10, 2025",True
+Pitney Bowes,Software Engineer- Shipping API,R19201,Interviewing,"January 24, 2025",True
+Apple Bank,"Business Development Officer, SVP",2025-0801,In Progress,"February 13, 2025",True
+Barclays,Trading UI Developer,JR-0000032943,Under Consideration,"March 10, 2025",True
+Barclays,Cash Management Sales VP,JR-0000041404,Screen Tests In Progress,"March 10, 2025",True
+Barclays,Rates Electronic Trading,JR-0000002949,Under Consideration,"March 10, 2025",True
+Barclays,Market Risk Business Analyst,JR-0000039897,Under Consideration,"February 23, 2025",True
+Barclays,Senior Trading UI Developer,JR-0000031981,Under Consideration,"February 23, 2025",True
+Barclays,Python Desk Developer,JR-0000040052,Under Consideration,"February 23, 2025",True
