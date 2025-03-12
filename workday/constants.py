@@ -1,0 +1,8 @@
+PARENT_TABPANEL_DIV = "div[@role='tabpanel' and not(@hidden)]"
+PAGINATION_NAV="nav[@data-automation-id='pagination']"
+NEXT_BUTTON="button[@aria-label='Next' and not(@aria-disabled='True')]"
+JOB_TITLE_COLUMN="div[@data-automation-id='applicationTitle']"
+JOB_REQ_COLUMN="td[@class='css-x4yhc3']"
+JOB_STATUS_COLUMN="div[@data-automation-id='applicationStatus']"
+DATE_SUBMITTED_COLUMN="td[@class='css-62prxo']"
+ACCOUNT_SETTINGS_ID="accountSettingsButton"

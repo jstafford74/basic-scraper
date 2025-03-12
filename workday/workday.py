@@ -3,6 +3,16 @@ import time
 from typing import List
 
 from application import Application
+from constants import (
+    ACCOUNT_SETTINGS_ID,
+    DATE_SUBMITTED_COLUMN,
+    JOB_REQ_COLUMN,
+    JOB_STATUS_COLUMN,
+    JOB_TITLE_COLUMN,
+    NEXT_BUTTON,
+    PAGINATION_NAV,
+    PARENT_TABPANEL_DIV,
+)
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -78,26 +88,45 @@ def workday_scrape(sites_list:List[WorkdaySite]):
                 print("logged in")
 
                 # Find account settings button for signout
-                # account_button = browser.find_element(By.ID, "accountSettingsButton")
-                # #Find Active & Inactive Tabs
-  
+                account_button = browser.find_element(By.ID, ACCOUNT_SETTINGS_ID)
+                
+                #Find Active & Inactive Tabs
                 status_tabs = find_elements_by_xpath(browser,"//section[@data-automation-id='applicationsSectionHeading']//button[@role='tab']")
                 active_button_text = status_tabs[0].text if status_tabs[0] else None
-                # inactive_button_text = status_tabs[1].text if status_tabs[1] else None
+                inactive_button_text = status_tabs[1].text if status_tabs[1] else None
 
                 active_apps = get_active_and_inactive_apps(active_button_text)
-
-                # inactive_apps = get_active_and_inactive_apps(inactive_button_text)
+                inactive_apps = get_active_and_inactive_apps(inactive_button_text)
                 
-                upper_limit = math.ceil(int(active_apps) / 4)
-                # Loop through all active tabs based on 4 displayed
-                for i in range(1, upper_limit + 1):
+                active_app_upper_limit = math.ceil(int(active_apps) / 4)
+                inactive_app_upper_limit = math.ceil(int(inactive_apps) / 4)
+
+                # If zero apps are active or inactive report them per employer
+                if int(active_apps) == 0:
+                    job_app = Application(site.name,"N/A", "N/A", "N/A", "N/A", is_active=True)
+                    applications.append(job_app)
+                    
+                if int(inactive_apps) == 0:
+                    job_app = Application(site.name,"N/A", "N/A", "N/A", "N/A", is_active=False)
+                    applications.append(job_app)
+
+                # If both app types are equal to zero, continue to next employer
+                if int(active_apps) == 0 and int(inactive_apps) == 0:
+                    print("both active and inactive apps are zero")
+                    zero_active_job_app = Application(site.name,"N/A", "N/A", "N/A", "N/A", is_active=True)
+                    zero_inactive_job_app = Application(site.name,"N/A", "N/A", "N/A", "N/A", is_active=False)
+                    applications.append(zero_active_job_app,zero_inactive_job_app)
+                    write_objects_to_csv('current_applications.csv',applications)
+                    continue     
+
+                #//START active tab iteration
+                for i in range(1, active_app_upper_limit + 1):
                     print(f"iteration: {i}")
                     time.sleep(3)
-                    job_title_column = find_elements_by_xpath(browser,f"{parent_tabpanel_div}//div[@data-automation-id='applicationTitle']")
-                    job_req_column = find_elements_by_xpath(browser,f"{parent_tabpanel_div}//td[@class='css-x4yhc3']")
-                    status_column = find_elements_by_xpath(browser,f"{parent_tabpanel_div}//div[@data-automation-id='applicationStatus']")
-                    date_submitted_column = find_elements_by_xpath(browser,f"{parent_tabpanel_div}//td[@class='css-62prxo']")
+                    job_title_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}")
+                    job_req_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}")
+                    status_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}")
+                    date_submitted_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}")
 
                     for idx,row in enumerate(job_title_column):
                         job_title = row.text
@@ -112,125 +141,73 @@ def workday_scrape(sites_list:List[WorkdaySite]):
                     time.sleep(3)
 
                     print("=====Checking for Pagination=====")
-                    has_pagination = find_elements_by_xpath(browser,f"{parent_tabpanel_div}//nav[@data-automation-id='pagination']")
+                    has_pagination = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}")
 
                     if not has_pagination:
                         print("no pagination present")
                     else:
                         print(f"{site.name} pagination: {has_pagination[0]}")
-                        next_button = browser.find_element(By.XPATH,f"{parent_tabpanel_div}//nav[@data-automation-id='pagination']//button[@aria-label='Next' and not(@aria-disabled='True')]") if len(has_pagination) else False
+                        next_button = browser.find_element(By.XPATH,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}") if len(has_pagination) else False
                         print("Clicking Next Button")
                         next_button.click()
                         time.sleep(3)
-                                            
-                # Click on the drop down
-                # account_button.click()
-                # time.sleep(5)
-                # Find the Sign Out Button
-                # sign_out_button = browser.find_element(By.ID, "item1")
-                # Performing the mouse hover action on the target element.
-                # print("Active Button")
-                # print_element(active_button)
-                # print(len(active_button))
+                #//END active tab iteration
+                
+                #//START inactive tab iteration
+                status_tabs[1].click()
+                if int(inactive_apps) > 0:
+                    for i in range(1, inactive_app_upper_limit + 1):
+                        print(f"inactive iteration: {i}")
+                        time.sleep(3)
+                        inactive_job_title_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}")
+                        inactive_job_req_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}")
+                        inactive_status_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}")
+                        inactive_date_submitted_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}")
 
+                        for idx,row in enumerate(inactive_job_title_column):
+                            job_title = row.text
+                            job_req_id = inactive_job_req_column[idx].text
+                            job_status = inactive_status_column[idx].text
+                            date_submitted = inactive_date_submitted_column[idx].text
+
+                            job_app = Application(site.name,job_title,job_req_id,job_status,date_submitted,is_active=False)
+
+                            applications.append(job_app)
+
+                        time.sleep(3)
+
+                        print("=====Checking for inactive Pagination=====")
+                        has_pagination = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}")
+
+                        if not has_pagination:
+                            print("no pagination present")
+                        else:
+                            print(f"{site.name} pagination: {has_pagination[0]}")
+                            next_button = browser.find_element(By.XPATH,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}") if len(has_pagination) else False
+                            print("Clicking Next Button")
+                            next_button.click()
+                            time.sleep(3)
+                #//END active tab iteration
+                
 
                 print(f"Applications: {len(applications)}")
-                print(applications)
+                
                 write_objects_to_csv('current_applications.csv',applications)
                 # sign_out_button.click()
-                time.sleep(10)
+                time.sleep(5)
 
         except Exception:
             print("Something went wrong")
             print(Exception)
         finally:
-            print("logged in")
-
-        # # ===============LOGOUT===============
-        # try:
-        #     if is_webpage:
-        #         # Find the elements
-        #         account_button = browser.find_element(By.ID, "accountSettingsButton")
-
-        #         # Click on the drop down
-        #         account_button.click()
-        #         time.sleep(2)
-        #         # Find the Sign Out Button
-        #         sign_out_button = browser.find_element(By.ID, "item1")
-        #         sign_out_button.click()
-        # except Exception:
-        #     print("Something went wrong")
-        #     print(Exception)
-        # finally:
-        #     print("logged out")
-
-        # try:
-        #     time.sleep(5)
-        #     button_elements = browser.find_elements(By.TAG_NAME, "button")
-        #     submit_button = None
-        #     for button in button_elements:
-        #         if button.text == "Search for Jobs":
-        #             submit_button = button
-        #             continue
-
-        #     time.sleep(2)
-        #     submit_button.click()
-        # finally:
-        #     print("clicked on search tab")
-
-        # try:
-        #     time.sleep(5)
-
-        #     filter_button_elements = browser.find_elements(By.TAG_NAME, "button")
-        #     location_button = None
-
-        #     for button in filter_button_elements:
-        #         if button.text == "Distance or Location":
-        #             location_button = button
-        #             continue
-
-        #     time.sleep(1)
-        #     location_button.click()
-
-        # finally:
-        #     print("clicked on location selection")
-
-        # try:
-        #     time.sleep(2)
-        #     location_checkbox = browser.find_element(By.ID, "location")
-
-        #     location_checkbox.click()
-        #     time.sleep(3)
-        #     location_container = browser.find_element(
-        #         By.CLASS_NAME, "ReactVirtualized__Grid__innerScrollContainer"
-        #     )
-
-        #     first_checkbox = location_container.find_elements(By.TAG_NAME, "input")
-        #     # second_checkbox = location_container.find_element(
-        #     #     By.XPATH, ".//*[contains(text(), 'USA, CT, Remote')]"
-        #     # )
-        #     print(first_checkbox)
-        #     print(len(first_checkbox))
-        #     for _ in range(1):
-        #         actions.move_to_element(location_container).perform()
-        #         print(first_checkbox)
-        #         print(len(first_checkbox))
-
-        #     # for checkbox in first_checkbox:
-        #     #     print(
-        #     #         f"{checkbox.accessible_name}: {re.search('USA, CT, Remote', checkbox.accessible_name)}"
-        #     #     )
-        #     #     if checkbox.accessible_name == "USA, CT, Remote":
-        #     #         print("checkbox")
-        #     #         print(checkbox)
-        #     #         checkbox.click()
-
-        # finally:
-        # print("clicked on location")
+            # Click on account settings
+            account_button.click()
+            time.sleep(3)
+            # Find the Sign Out Button
+            sign_out_button = browser.find_element(By.XPATH, "//button[@aria-label='Sign Out']")
+            sign_out_button.click()
+            time.sleep(2)
+            browser.close()
 
 
 workday_scrape(workday_list)
-
-
-# "View Jobs"
-# ""
