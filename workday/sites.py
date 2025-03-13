@@ -214,5 +214,29 @@ workday_data = [
         "url": os.getenv("BLACKSTONE_URL"),
         "email": os.getenv("DEFAULT_EMAIL"),
         "password": os.getenv("DEFAULT_PASSWORD"),
-    }
+    },
+    {
+        "name": "CIBC",
+        "url": os.getenv("CIBC_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "CBOE",
+        "url": os.getenv("CBOE_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Cushman & Wakefield",
+        "url": os.getenv("CUSHMAN_WAKEFIELD_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Prudential",
+        "url": os.getenv("PRUDENTIAL_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
 ]

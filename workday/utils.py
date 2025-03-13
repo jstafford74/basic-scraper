@@ -1,8 +1,12 @@
 import csv
 import os
+import re
 from typing import List, Union
 
+from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -53,3 +57,22 @@ def write_objects_to_csv(file_name: str, objects: list):
         writer.writerows(objects_dict)
         
     print(f"Data written to {file_name} successfully.")
+
+def instantiate_browser():
+         # Options for browser to remain open
+     chrome_options = Options()
+     chrome_options.add_experimental_option("detach", True)
+     # Define and locate chrome driver/service
+     service = Service(
+         r"C:\Users\jstaf\Documents\chromedriver\chromedriver-win64\chromedriver.exe"
+     )
+     browser = webdriver.Chrome(service=service, options=chrome_options)
+
+     return browser
+
+
+def extract_integer(s):
+    # Search for an integer pattern in the string
+    match = re.search(r'\d+', s)
+    # Return the integer if found, else return None
+    return int(match.group()) if match else None

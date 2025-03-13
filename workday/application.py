@@ -21,7 +21,7 @@ class Application:
         self.status = status
         self.date_submitted = date_submitted
         self.is_active = is_active
-        self.updated_at=dt_string
+        self.updated_at = dt_string
 
     def to_dict(self):
         # Convert object properties to a dictionary
@@ -32,4 +32,22 @@ class Application:
             "status": self.status,
             "date_submitted": self.date_submitted,
             "is_active": self.is_active,
+            "updated_at": self.updated_at,
+        }
+
+
+class TotalJob:
+    def __init__(self, employer_name, total_jobs):
+        now = datetime.now()
+        dt_string = now.strftime("%m-%d-%Y")
+        self.employer_name = employer_name
+        self.total_jobs = total_jobs
+        self.updated_at = dt_string
+
+    def to_dict(self):
+        # Convert object properties to a dictionary
+        return {
+            "employer_name": self.employer_name,
+            "total_jobs": self.total_jobs,
+            "updated_at": self.updated_at,
         }
