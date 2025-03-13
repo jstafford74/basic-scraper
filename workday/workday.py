@@ -6,12 +6,15 @@ from application import Application
 from constants import (
     ACCOUNT_SETTINGS_ID,
     DATE_SUBMITTED_COLUMN,
+    EMAIL_FIELD_ID,
     JOB_REQ_COLUMN,
     JOB_STATUS_COLUMN,
     JOB_TITLE_COLUMN,
     NEXT_BUTTON,
     PAGINATION_NAV,
     PARENT_TABPANEL_DIV,
+    PASSWORD_FIELD_ID,
+    SIGN_IN_CLASS,
 )
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -35,8 +38,6 @@ class WorkdaySite:
     
 
 workday_list = [WorkdaySite(**data) for data in workday_data]
-
-parent_tabpanel_div = "//div[@role='tabpanel' and not(@hidden)]"
     
 def workday_scrape(sites_list:List[WorkdaySite]):
     # Load environment variables
@@ -57,34 +58,32 @@ def workday_scrape(sites_list:List[WorkdaySite]):
         print(site.name)
         print(site.url)
         is_webpage = "/login" in site.url
-        email_field_id = "input-4"
-        password_field_id = "input-5"
 
         browser.get(site.url)
          # pause for username & password entry
-        time.sleep(3)
+        time.sleep(2)
 
         # ===============LOGIN===============
         try:
             if is_webpage:
                 # Find the elements
-                email_element = browser.find_element(By.ID, email_field_id)
-                password_element = browser.find_element(By.ID, password_field_id)
-                sign_in_button = browser.find_element(By.CLASS_NAME, "css-1s1r74k")
+                email_element = browser.find_element(By.ID, EMAIL_FIELD_ID)
+                password_element = browser.find_element(By.ID, PASSWORD_FIELD_ID)
+                sign_in_button = browser.find_element(By.CLASS_NAME,SIGN_IN_CLASS )
 
                 # Enter username
                 email_element.click()
                 email_element.clear()
                 email_element.send_keys(site.email)
-                time.sleep(2)
+                time.sleep(1)
                 # enter password
                 password_element.click()
                 password_element.clear()
                 password_element.send_keys(site.password)
-                time.sleep(2)
+                time.sleep(1)
                 # Login
                 sign_in_button.click()
-                time.sleep(10)
+                time.sleep(4)
                 print("logged in")
 
                 # Find account settings button for signout
@@ -122,7 +121,7 @@ def workday_scrape(sites_list:List[WorkdaySite]):
                 #//START active tab iteration
                 for i in range(1, active_app_upper_limit + 1):
                     print(f"iteration: {i}")
-                    time.sleep(3)
+                    time.sleep(2)
                     job_title_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}")
                     job_req_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}")
                     status_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}")
@@ -138,7 +137,7 @@ def workday_scrape(sites_list:List[WorkdaySite]):
 
                         applications.append(job_app)
 
-                    time.sleep(3)
+                    time.sleep(2)
 
                     print("=====Checking for Pagination=====")
                     has_pagination = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}")
@@ -158,7 +157,7 @@ def workday_scrape(sites_list:List[WorkdaySite]):
                 if int(inactive_apps) > 0:
                     for i in range(1, inactive_app_upper_limit + 1):
                         print(f"inactive iteration: {i}")
-                        time.sleep(3)
+                        time.sleep(2)
                         inactive_job_title_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}")
                         inactive_job_req_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}")
                         inactive_status_column = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}")
@@ -174,7 +173,7 @@ def workday_scrape(sites_list:List[WorkdaySite]):
 
                             applications.append(job_app)
 
-                        time.sleep(3)
+                        time.sleep(2)
 
                         print("=====Checking for inactive Pagination=====")
                         has_pagination = find_elements_by_xpath(browser,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}")
@@ -186,7 +185,7 @@ def workday_scrape(sites_list:List[WorkdaySite]):
                             next_button = browser.find_element(By.XPATH,f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}") if len(has_pagination) else False
                             print("Clicking Next Button")
                             next_button.click()
-                            time.sleep(3)
+                            time.sleep(2)
                 #//END active tab iteration
                 
 
@@ -194,7 +193,7 @@ def workday_scrape(sites_list:List[WorkdaySite]):
                 
                 write_objects_to_csv('current_applications.csv',applications)
                 # sign_out_button.click()
-                time.sleep(5)
+                time.sleep(2)
 
         except Exception:
             print("Something went wrong")
