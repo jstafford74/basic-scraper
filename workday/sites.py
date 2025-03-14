@@ -180,12 +180,6 @@ workday_data = [
         "password": os.getenv("DEFAULT_PASSWORD"),
     },
     {
-        "name": "Wellington",
-        "url": os.getenv("WELLINGTON_URL"),
-        "email": os.getenv("DEFAULT_EMAIL"),
-        "password": os.getenv("DEFAULT_PASSWORD"),
-    },
-    {
         "name": "ASML",
         "url": os.getenv("ASML_URL"),
         "email": os.getenv("DEFAULT_EMAIL"),
@@ -236,6 +230,24 @@ workday_data = [
     {
         "name": "Prudential",
         "url": os.getenv("PRUDENTIAL_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Zoetis",
+        "url": os.getenv("ZOETIS_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Blackrock",
+        "url": os.getenv("BLACKROCK_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Travelers",
+        "url": os.getenv("TRAVELERS_URL"),
         "email": os.getenv("DEFAULT_EMAIL"),
         "password": os.getenv("DEFAULT_PASSWORD"),
     },

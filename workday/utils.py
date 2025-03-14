@@ -34,6 +34,14 @@ def find_elements_by_xpath(driver: WebDriver, xpath: str) -> Union[bool, List[We
     except NoSuchElementException:
         return False
 
+def find_element_by_xpath(driver: WebDriver, xpath: str) -> Union[bool, List[WebElement]]:
+    try:
+        element = driver.find_element(By.XPATH, xpath)
+        # Return elements if found, else return False
+        return element if element else False
+    except NoSuchElementException:
+        return False
+    
 def write_objects_to_csv(file_name: str, objects: list):
     if not objects:
         print("No data to write to CSV")

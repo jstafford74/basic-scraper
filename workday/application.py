@@ -37,11 +37,13 @@ class Application:
 
 
 class TotalJob:
-    def __init__(self, employer_name, total_jobs):
+    
+    def __init__(self, employer_name, total_jobs,new_york = 0):
         now = datetime.now()
         dt_string = now.strftime("%m-%d-%Y")
         self.employer_name = employer_name
         self.total_jobs = total_jobs
+        self.new_york = new_york
         self.updated_at = dt_string
 
     def to_dict(self):
@@ -49,5 +51,6 @@ class TotalJob:
         return {
             "employer_name": self.employer_name,
             "total_jobs": self.total_jobs,
+            "ny_jobs": self.new_york,
             "updated_at": self.updated_at,
         }

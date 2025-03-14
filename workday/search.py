@@ -5,6 +5,7 @@ CHECKBOX_INPUT_ID="location"
 LABEL_CLASS="css-1ew7hmu"
 CHECKBOX_CLASS="css-1spbduv"
 KEYWORD_SEARCH_INPUT="//input[@data-automation-id='keywordSearchInput']"
+KEYWORD_SEARCH_BUTTON="//button[@data-automation-id='keywordSearchButton']"
 
 '''
 - click on search for jobs if it exists
