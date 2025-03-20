@@ -2,3 +2,6 @@ beautifulsoup4
 requests
 selenium
 python-dotenv
+pymongo[srv]
+yfinance
+finnhub-python

@@ -1,33 +1,30 @@
-employer_name,total_jobs,ny_jobs,updated_at
-Capital One,1789,1670,03-13-2025
-Mitsubishi Bank,531,150,03-13-2025
-TD Bank,1634,255,03-13-2025
-Wells Fargo,1733,90,03-13-2025
-Synchrony,108,2,03-13-2025
-Mastercard,1051,84,03-13-2025
-G Research,42,0,03-13-2025
-Wellington,79,19,03-13-2025
-Russell Investments,68,56,03-13-2025
-Mizuho,72,69,03-13-2025
-Gartner,818,28,03-13-2025
-Northern Trust,563,12,03-13-2025
-Santander,1548,20,03-13-2025
-PNC Bank,1476,28,03-13-2025
-Citibank,2000,642,03-13-2025
-Pitney Bowes,93,3,03-13-2025
-Deutsche Bank,1982,227,03-13-2025
-Apple Bank,38,23,03-13-2025
-Franklin Investments,95,32,03-13-2025
-General Motors,427,37,03-13-2025
-Key Bank,519,120,03-13-2025
-Bank of Montreal,930,32,03-13-2025
-Wellington,79,19,03-13-2025
-Voya Investments,100,25,03-13-2025
-Aberdeen,37,0,03-13-2025
-Balyasny Asset Management,1,1,03-13-2025
-Blackstone,220,143,03-13-2025
-CIBC,665,28,03-13-2025
-CBOE,43,27,03-13-2025
-Cushman & Wakefield,1974,56,03-13-2025
-Zoetis,241,39,03-13-2025
-Blackrock,530,135,03-13-2025
+employer_name,total_jobs,usa,ny_jobs,connecticut,texas,massachusetts,new_jersey,maryland,north_carolina,florida,california,updated_at
+Capital One,1779,93,1653,0,8,0,4,10,0,1,1653,03-17-2025
+Mitsubishi Bank,531,107,150,0,1,0,68,0,0,1,259,03-17-2025
+TD Bank,1347,1291,206,5,1,38,219,2,119,63,0,03-17-2025
+Wells Fargo,1551,1551,72,5,14,6,5,3,28,9,32,03-17-2025
+Synchrony,93,7,1,0,4,1,0,1,3,0,0,03-17-2025
+T Rowe,96,46,93,0,0,0,1,93,0,0,93,03-17-2025
+Mastercard,1036,175,82,0,5,24,1,0,1,11,17,03-17-2025
+G Research,42,0,0,1,1,0,0,0,0,0,0,03-17-2025
+Wellington,78,61,18,3,2,5,3,2,0,2,0,03-17-2025
+Russell Investments,70,62,56,0,0,0,0,0,0,0,0,03-17-2025
+Mizuho,71,3,68,0,0,0,1,0,0,0,0,03-17-2025
+Gartner,809,134,28,14,50,8,13,5,9,,21,03-17-2025
+Northern Trust,553,46,12,0,0,0,1,0,0,1,0,03-17-2025
+Santander,1518,232,19,1,47,0,1,0,0,1,0,03-17-2025
+PNC Bank,1482,1479,30,0,22,0,57,17,11,67,1483,03-17-2025
+Citibank,2000,2000,633,10,851,9,64,7,36,644,265,03-17-2025
+Pitney Bowes,96,16,4,4,6,4,4,0,6,5,2,03-17-2025
+Deutsche Bank,1990,121,232,0,0,0,0,0,23,10,210,03-17-2025
+Apple Bank,35,0,21,0,0,0,3,0,0,0,0,03-17-2025
+Franklin Investments,96,59,33,11,4,16,3,8,0,,16,03-17-2025
+General Motors,403,297,33,1,42,0,0,0,10,0,49,03-17-2025
+Key Bank,514,514,119,24,3,,,1,0,6,3,03-17-2025
+Bank of Montreal,853,361,34,0,6,0,0,0,4,9,92,03-17-2025
+Voya Investments,106,55,24,15,3,11,2,1,2,10,1,03-17-2025
+Aberdeen,40,0,0,0,0,0,0,0,0,0,0,03-17-2025
+Balyasny Asset Management,1,0,1,0,0,0,0,0,0,0,0,03-17-2025
+Blackstone,224,176,145,0,1,1,17,0,0,17,3,03-17-2025
+CIBC,609,33,31,0,1,0,0,0,0,0,112,03-17-2025
+Zoetis,237,6,37,36,2,36,36,0,1,0,50,03-17-2025

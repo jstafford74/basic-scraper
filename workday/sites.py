@@ -6,7 +6,7 @@ load_dotenv()
 
 workday_data = [
     {
-        "name": "Capital One",
+        "name": "Capital One Financial",
         "url": os.getenv("CAPITAL_ONE_URL"),
         "email": os.getenv("DEFAULT_EMAIL"),
         "password": os.getenv("DEFAULT_PASSWORD"),
@@ -250,5 +250,113 @@ workday_data = [
         "url": os.getenv("TRAVELERS_URL"),
         "email": os.getenv("DEFAULT_EMAIL"),
         "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Salesforce",
+        "url": os.getenv("SALESFORCE_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "AIG",
+        "url": os.getenv("AIG_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Genworth",
+        "url": os.getenv("GENWORTH_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "CVS Health",
+        "url": os.getenv("CVS_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Factset",
+        "url": os.getenv("FACTSET_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Fico",
+        "url": os.getenv("FICO_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Maxar",
+        "url": os.getenv("MAXAR_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Nike",
+        "url": os.getenv("NIKE_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Truist",
+        "url": os.getenv("TRUIST_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Castleton Commodities",
+        "url": os.getenv("CASTLETON_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Webster Bank",
+        "url": os.getenv("WEBSTER_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Accenture",
+        "url": os.getenv("ACCENTURE_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Apollo",
+        "url": os.getenv("APOLLO_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Zillow",
+        "url": os.getenv("ZILLOW_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Crowdstrike",
+        "url": os.getenv("CROWDSTRIKE_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Fifth Third",
+        "url": os.getenv("FIFTH_THIRD_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Millenium",
+        "url": os.getenv("MLP_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("DEFAULT_PASSWORD"),
+    },
+    {
+        "name": "Comcast",
+        "url": os.getenv("COMCAST_URL"),
+        "email": os.getenv("DEFAULT_EMAIL"),
+        "password": os.getenv("COMCAST_PASSWORD"),
     },
 ]
