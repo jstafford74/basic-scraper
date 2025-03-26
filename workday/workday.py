@@ -1,77 +1,50 @@
 import math
-import os
 import time
 import traceback
 from datetime import datetime
 
-from application import Application
 from bson import ObjectId
+from classes.application import Application
 from constants import (
     CLEAR_ALL,
     DATE_SUBMITTED_COLUMN,
-    EMAIL_FIELD_ID,
     JOB_REQ_COLUMN,
     JOB_STATUS_COLUMN,
     JOB_TITLE_COLUMN,
     NEXT_BUTTON,
     PAGINATION_NAV,
     PARENT_TABPANEL_DIV,
-    PASSWORD_FIELD_ID,
-    SIGN_IN_CLASS,
-    SIGN_OUT_BUTTON,
     STATE_SEARCHES,
-    STATUS_TABS_SECTION,
-    UTILITY_BUTTON,
 )
-from controllers import CompanyController
+from controllers import ApplicationsController, CompanyController, SnapshotsController
 from dotenv import load_dotenv
-from pymongo import MongoClient
 from search import (
     FOUND_JOBS,
     KEYWORD_SEARCH_BUTTON,
     KEYWORD_SEARCH_INPUT,
     SEARCH_FOR_JOBS,
 )
-from selenium.webdriver.common.by import By
-from sites import workday_data
 from utils import (
     extract_integer,
+    find_active_and_inactive_tabs,
     find_element_by_xpath,
     find_elements_by_xpath,
     instantiate_browser,
+    login,
+    logout,
 )
-
-
-class WorkdaySite:
-    def __init__(self, name, url, email, password):
-        self.name = name
-        self.url = url
-        self.email = email
-        self.password = password
-
-
-workday_list = [WorkdaySite(**data) for data in workday_data]
 
 
 def workday_scrape(run_search=True, run_apps=True):
     # Load environment variables
     load_dotenv()
 
-    MONGO_URI = os.getenv("MONGO_URI")
-
-    client = MongoClient(MONGO_URI)
-    print("✅ Connected Databases:", client.list_database_names())
-
-    db = client.workday
-
+    applications_controller = ApplicationsController()
     company_controller = CompanyController()
-    # companies_collection = db.companies
-    applications_collection = db.applications
-    snapshots_collection = db.opening_snapshots
-    application_status_collection = db.application_statuses
+    snapshots_controller = SnapshotsController()
 
     sites_list = company_controller.get_all_documents_sorted_by_name()
-    print(sites_list)
+
     # Start the timer
     start_time = time.time()
     now = datetime.now()
@@ -90,44 +63,11 @@ def workday_scrape(run_search=True, run_apps=True):
         # ===============LOGIN===============
         try:
             # Find the log in elements
-            email_element = browser.find_element(By.ID, EMAIL_FIELD_ID)
-            password_element = browser.find_element(By.ID, PASSWORD_FIELD_ID)
-            sign_in_button = browser.find_element(By.CLASS_NAME, SIGN_IN_CLASS)
-            # Enter username
-            email_element.click()
-            email_element.clear()
-            email_element.send_keys(site["email"])
-            time.sleep(1)
-            # enter password
-            password_element.click()
-            password_element.clear()
-            password_element.send_keys(site["password"])
-            time.sleep(1)
-            # Login
-            sign_in_button.click()
-            time.sleep(4)
-            print("logged in")
-
-            # Find Active & Inactive Tabs
-
-            status_tabs = find_elements_by_xpath(browser, STATUS_TABS_SECTION)
-
-            active_button_text = (
-                status_tabs[0].text if status_tabs and len(status_tabs) else None
+            login(browser, site)
+           
+            active_apps, inactive_apps, status_tabs = find_active_and_inactive_tabs(
+                browser, site
             )
-            inactive_button_text = (
-                status_tabs[1].text if status_tabs and len(status_tabs) else None
-            )
-            # print(f"active tabs:{active_button_text}")
-            # print(f"iactive tabs:{inactive_button_text}")
-            active_apps = (
-                extract_integer(active_button_text) if active_button_text else 0
-            )
-            inactive_apps = (
-                extract_integer(inactive_button_text) if inactive_button_text else 0
-            )
-            print(f"active tabs:{active_apps}")
-            print(f"iactive tabs:{inactive_apps}")
 
             active_app_upper_limit = (
                 math.ceil(int(active_apps) / 4) if active_apps else 0
@@ -135,45 +75,7 @@ def workday_scrape(run_search=True, run_apps=True):
             inactive_app_upper_limit = (
                 math.ceil(int(inactive_apps) / 4) if inactive_apps else 0
             )
-            current_app_status = application_status_collection.find_one(
-                {"measure_date": dt_string}
-            )
 
-            is_upsert = True if current_app_status is None else False
-
-            if active_apps > 0:
-                active_apps_update = application_status_collection.update_one(
-                    {
-                        "measure_date": dt_string,
-                        "active_companies": {"$nin": [ObjectId(company_id)]},
-                    },
-                    {
-                        "$inc": {"active": active_apps},
-                        "$push": {"active_companies": ObjectId(company_id)},
-                    },
-                    upsert=is_upsert,
-                )
-                if active_apps_update.modified_count > 0:
-                    print(f"{site['name']} active apps updated successfully.")
-                else:
-                    print("No document found or document was not modified.")
-            if inactive_apps > 0:
-                inactive_apps_update = application_status_collection.update_one(
-                    {
-                        "measure_date": dt_string,
-                        "inactive_companies": {"$nin": [ObjectId(company_id)]},
-                    },
-                    {
-                        "$inc": {"inactive": inactive_apps},
-                        "$push": {"inactive_companies": ObjectId(company_id)},
-                    },
-                    upsert=is_upsert,
-                )
-                if inactive_apps_update.modified_count > 0:
-                    print(f"{site['name']} inactive apps updated successfully.")
-                else:
-                    print("No document found or document was not modified.")
-            
             # //START active tab iteration
             if run_apps:
                 active_job_reqs = []
@@ -215,14 +117,14 @@ def workday_scrape(run_search=True, run_apps=True):
                             "status": job_status,
                         }
 
-                        active_result = applications_collection.find_one(
+                        active_result = applications_controller.find_one_document(
                             application_to_find
                         )
 
                         active_job_reqs.append(job_req_id)
 
                         if active_result is None:
-                            new_app = applications_collection.insert_one(
+                            new_app = applications_controller.create_document(
                                 job_app.to_dict()
                             )
                             if new_app.acknowledged:
@@ -237,12 +139,14 @@ def workday_scrape(run_search=True, run_apps=True):
                                 print("job status' match, no update needed")
 
                             else:
-                                active_app_update = applications_collection.update_one(
-                                    {
-                                        "company_id": company_id,
-                                        "job_req_id": job_req_id,
-                                    },
-                                    {"$set": {"status": job_status}},
+                                active_app_update = (
+                                    applications_controller.update_one_document(
+                                        {
+                                            "company_id": company_id,
+                                            "job_req_id": job_req_id,
+                                        },
+                                        {"$set": {"status": job_status}},
+                                    )
                                 )
                                 if active_app_update.acknowledged:
                                     print(f"{site['name']} new app inserted")
@@ -319,7 +223,7 @@ def workday_scrape(run_search=True, run_apps=True):
                                 "status": job_status,
                             }
 
-                            inactive_result = applications_collection.find_one(
+                            inactive_result = applications_controller.find_one_document(
                                 application_to_find
                             )
 
@@ -327,13 +231,15 @@ def workday_scrape(run_search=True, run_apps=True):
 
                             if inactive_result is None:
                                 print("result is None")
-                                applications_collection.insert_one(job_app.to_dict())
+                                applications_controller.create_document(
+                                    job_app.to_dict()
+                                )
                             else:
                                 print("result is not None")
                                 if job_status == inactive_result["status"]:
                                     print("job status' match")
                                 else:
-                                    applications_collection.update_one(
+                                    applications_controller.update_one_document(
                                         {
                                             "company_id": company_id,
                                             "job_req_id": job_req_id,
@@ -387,7 +293,7 @@ def workday_scrape(run_search=True, run_apps=True):
                         else 0
                     )
 
-                    total_snapshot_update = snapshots_collection.update_one(
+                    total_snapshot_update = snapshots_controller.update_one_document(
                         {
                             "company_id": company_id,
                             "snapshot_date": dt_string,
@@ -434,7 +340,7 @@ def workday_scrape(run_search=True, run_apps=True):
                                 )
 
                                 current_search_snapshot = (
-                                    snapshots_collection.find_one_and_update(
+                                    snapshots_controller.update_one_document(
                                         {
                                             "company_id": company_id,
                                             "snapshot_date": dt_string,
@@ -442,10 +348,11 @@ def workday_scrape(run_search=True, run_apps=True):
                                         {
                                             "$set": {key: current_found_jobs},
                                         },
+                                        upsert=True,
                                     )
                                 )
 
-                                if current_search_snapshot["_id"]:
+                                if current_search_snapshot.acknowledged:
                                     print(f"{site['name']} {key} snapshot updated:")
                                 else:
                                     print(
@@ -463,22 +370,23 @@ def workday_scrape(run_search=True, run_apps=True):
             print("Something went wrong")
             traceback.print_exc()
         finally:
+            logout(browser)
             # Click on account settings
-            account_button = find_element_by_xpath(browser, UTILITY_BUTTON)
-            time.sleep(3)
+            # account_button = find_element_by_xpath(browser, UTILITY_BUTTON)
+            # time.sleep(3)
 
-            if account_button:
-                account_button.click()
+            # if account_button:
+            #     account_button.click()
 
-            time.sleep(3)
+            # time.sleep(3)
             # Find the Sign Out Button
-            sign_out_button = find_element_by_xpath(browser, SIGN_OUT_BUTTON)
-            time.sleep(2)
-            if sign_out_button:
-                sign_out_button.click()
+            # sign_out_button = find_element_by_xpath(browser, SIGN_OUT_BUTTON)
+            # time.sleep(2)
+            # if sign_out_button:
+            #     sign_out_button.click()
 
-            time.sleep(2)
-            browser.close()
+            # time.sleep(2)
+            # browser.close()
 
     # End the timer
     end_time = time.time()
@@ -493,4 +401,4 @@ def workday_scrape(run_search=True, run_apps=True):
     )
 
 
-workday_scrape(run_search=False, run_apps=False)
+workday_scrape(run_search=True, run_apps=True)

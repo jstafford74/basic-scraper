@@ -5,7 +5,8 @@ from datetime import datetime
 # import yfinance as yf
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from sites import workday_data
+
+from workday.db.sites import workday_data
 
 # Initialize the client
 # finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
