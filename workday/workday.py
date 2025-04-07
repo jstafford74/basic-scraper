@@ -44,7 +44,7 @@ def workday_scrape(run_search=True, run_apps=True):
     snapshots_controller = SnapshotsController()
 
     sites_list = company_controller.get_all_documents_sorted_by_name()
-
+    print(f"sites in db: {len(sites_list)}")
     # Start the timer
     start_time = time.time()
     now = datetime.now()
@@ -56,228 +56,14 @@ def workday_scrape(run_search=True, run_apps=True):
         browser = instantiate_browser()
 
         print(f"Visiting {site['name']} at {site['url']}")
-        browser.get(site["url"])
-        # pause for username & password entry
+
+        base_url = site["url"].replace("/login", "")
+        browser.get(base_url)
+
         time.sleep(2)
 
         # ===============LOGIN===============
         try:
-            # Find the log in elements
-            login(browser, site)
-           
-            active_apps, inactive_apps, status_tabs = find_active_and_inactive_tabs(
-                browser, site
-            )
-
-            active_app_upper_limit = (
-                math.ceil(int(active_apps) / 4) if active_apps else 0
-            )
-            inactive_app_upper_limit = (
-                math.ceil(int(inactive_apps) / 4) if inactive_apps else 0
-            )
-
-            # //START active tab iteration
-            if run_apps:
-                active_job_reqs = []
-                inactive_job_reqs = []
-                for i in range(1, active_app_upper_limit + 1):
-                    print(f"iteration: {i}")
-                    # time.sleep(2)
-                    job_title_column = find_elements_by_xpath(
-                        browser, f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}"
-                    )
-                    job_req_column = find_elements_by_xpath(
-                        browser, f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}"
-                    )
-                    status_column = find_elements_by_xpath(
-                        browser, f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}"
-                    )
-                    date_submitted_column = find_elements_by_xpath(
-                        browser, f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}"
-                    )
-                    for idx, row in enumerate(job_title_column):
-                        job_title = row.text
-                        job_req_id = job_req_column[idx].text
-                        job_status = status_column[idx].text
-                        date_submitted = date_submitted_column[idx].text
-
-                        job_app = Application(
-                            company_id,
-                            job_title,
-                            job_req_id,
-                            job_status,
-                            date_submitted,
-                            is_active=True,
-                        )
-
-                        # Insert application
-                        application_to_find = {
-                            "company_id": company_id,
-                            "job_req_id": job_req_id,
-                            "status": job_status,
-                        }
-
-                        active_result = applications_controller.find_one_document(
-                            application_to_find
-                        )
-
-                        active_job_reqs.append(job_req_id)
-
-                        if active_result is None:
-                            new_app = applications_controller.create_document(
-                                job_app.to_dict()
-                            )
-                            if new_app.acknowledged:
-                                print(f"{site['name']} new app inserted")
-                            else:
-                                print(
-                                    "something went wrong with new active app insertion"
-                                )
-
-                        else:
-                            if job_status == active_result["status"]:
-                                print("job status' match, no update needed")
-
-                            else:
-                                active_app_update = (
-                                    applications_controller.update_one_document(
-                                        {
-                                            "company_id": company_id,
-                                            "job_req_id": job_req_id,
-                                        },
-                                        {"$set": {"status": job_status}},
-                                    )
-                                )
-                                if active_app_update.acknowledged:
-                                    print(f"{site['name']} new app inserted")
-                                else:
-                                    print(
-                                        "something went wrong with new active app insertion"
-                                    )
-                    time.sleep(1)
-
-                    has_pagination = find_elements_by_xpath(
-                        browser, f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}"
-                    )
-                    if not has_pagination:
-                        print("no pagination present")
-                    else:
-                        next_button = find_element_by_xpath(
-                            browser,
-                            f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}",
-                        )
-                        print("Clicking Next Button")
-                        next_button.click()
-                        time.sleep(1)
-
-                    if len(active_job_reqs) and idx == len(job_title_column) - 1:
-                        active_job_update = company_controller.update_document(
-                            company_id,
-                            {"active_applications": active_job_reqs},
-                        )
-                        if active_job_update:
-                            print(f"{site['name']} active apps updated successfully.")
-                        else:
-                            print("No document found or document was not modified.")
-
-                # //END active tab iteration
-
-                # //START inactive tab iteration
-                if status_tabs and len(status_tabs):
-                    status_tabs[1].click()
-
-                if int(inactive_apps) > 0:
-                    for i in range(1, inactive_app_upper_limit + 1):
-                        print(f"inactive iteration: {i}")
-                        # time.sleep(2)
-                        inactive_job_title_column = find_elements_by_xpath(
-                            browser, f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}"
-                        )
-                        inactive_job_req_column = find_elements_by_xpath(
-                            browser, f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}"
-                        )
-                        inactive_status_column = find_elements_by_xpath(
-                            browser, f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}"
-                        )
-                        inactive_date_submitted_column = find_elements_by_xpath(
-                            browser, f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}"
-                        )
-                        for idx, row in enumerate(inactive_job_title_column):
-                            job_title = row.text
-                            job_req_id = inactive_job_req_column[idx].text
-                            job_status = inactive_status_column[idx].text
-                            date_submitted = inactive_date_submitted_column[idx].text
-
-                            job_app = Application(
-                                company_id,
-                                job_title,
-                                job_req_id,
-                                job_status,
-                                date_submitted,
-                                is_active=False,
-                            )
-                            # Insert application
-                            application_to_find = {
-                                "company_id": company_id,
-                                "job_req_id": job_req_id,
-                                "status": job_status,
-                            }
-
-                            inactive_result = applications_controller.find_one_document(
-                                application_to_find
-                            )
-
-                            inactive_job_reqs.append(job_req_id)
-
-                            if inactive_result is None:
-                                print("result is None")
-                                applications_controller.create_document(
-                                    job_app.to_dict()
-                                )
-                            else:
-                                print("result is not None")
-                                if job_status == inactive_result["status"]:
-                                    print("job status' match")
-                                else:
-                                    applications_controller.update_one_document(
-                                        {
-                                            "company_id": company_id,
-                                            "job_req_id": job_req_id,
-                                        },
-                                        {"$set": {"status": job_status}},
-                                    )
-
-                        time.sleep(2)
-                        print("=====Checking for inactive Pagination=====")
-                        has_pagination = find_elements_by_xpath(
-                            browser, f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}"
-                        )
-                        if not has_pagination:
-                            print("no pagination present")
-                        else:
-                            next_button = (
-                                find_element_by_xpath(
-                                    browser,
-                                    f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}",
-                                )
-                                if len(has_pagination)
-                                else False
-                            )
-                            print("Clicking Next Button")
-                            next_button.click()
-                            time.sleep(2)
-
-                        if (
-                            len(inactive_job_reqs)
-                            and idx == len(inactive_job_title_column) - 1
-                        ):
-                            company_controller.update_document(
-                                company_id,
-                                {"inactive_applications": inactive_job_reqs},
-                            )
-
-                # //END active tab iteration
-
             if run_search:
                 search_jobs = find_element_by_xpath(browser, SEARCH_FOR_JOBS)
 
@@ -364,29 +150,232 @@ def workday_scrape(run_search=True, run_apps=True):
                                 clear_all_button.click()
                                 time.sleep(2)
 
+            if site["password"]:
+                # Find the log in elements
+                browser.get(site["url"])
                 time.sleep(2)
+                login(browser, site)
+
+                active_apps, inactive_apps, status_tabs = find_active_and_inactive_tabs(
+                    browser, site
+                )
+
+                active_app_upper_limit = (
+                    math.ceil(int(active_apps) / 4) if active_apps else 0
+                )
+                inactive_app_upper_limit = (
+                    math.ceil(int(inactive_apps) / 4) if inactive_apps else 0
+                )
+
+                # //START active tab iteration
+                if run_apps:
+                    active_job_reqs = []
+                    inactive_job_reqs = []
+                    for i in range(1, active_app_upper_limit + 1):
+                        print(f"iteration: {i}")
+                        # time.sleep(2)
+                        job_title_column = find_elements_by_xpath(
+                            browser, f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}"
+                        )
+                        job_req_column = find_elements_by_xpath(
+                            browser, f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}"
+                        )
+                        status_column = find_elements_by_xpath(
+                            browser, f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}"
+                        )
+                        date_submitted_column = find_elements_by_xpath(
+                            browser, f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}"
+                        )
+                        for idx, row in enumerate(job_title_column):
+                            job_title = row.text
+                            job_req_id = job_req_column[idx].text
+                            job_status = status_column[idx].text
+                            date_submitted = date_submitted_column[idx].text
+
+                            job_app = Application(
+                                company_id,
+                                job_title,
+                                job_req_id,
+                                job_status,
+                                date_submitted,
+                                is_active=True,
+                            )
+
+                            # Insert application
+                            application_to_find = {
+                                "company_id": company_id,
+                                "job_req_id": job_req_id,
+                                "status": job_status,
+                            }
+
+                            active_result = applications_controller.find_one_document(
+                                application_to_find
+                            )
+
+                            active_job_reqs.append(job_req_id)
+
+                            if active_result is None:
+                                new_app = applications_controller.create_document(
+                                    job_app.to_dict()
+                                )
+                                if new_app.acknowledged:
+                                    print(f"{site['name']} new app inserted")
+                                else:
+                                    print(
+                                        "something went wrong with new active app insertion"
+                                    )
+
+                            else:
+                                if job_status == active_result["status"]:
+                                    print("job status' match, no update needed")
+
+                                else:
+                                    active_app_update = (
+                                        applications_controller.update_one_document(
+                                            {
+                                                "company_id": company_id,
+                                                "job_req_id": job_req_id,
+                                            },
+                                            {"$set": {"status": job_status}},
+                                        )
+                                    )
+                                    if active_app_update.acknowledged:
+                                        print(f"{site['name']} new app inserted")
+                                    else:
+                                        print(
+                                            "something went wrong with new active app insertion"
+                                        )
+                        time.sleep(1)
+
+                        has_pagination = find_elements_by_xpath(
+                            browser, f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}"
+                        )
+                        if not has_pagination:
+                            print("no pagination present")
+                        else:
+                            next_button = find_element_by_xpath(
+                                browser,
+                                f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}",
+                            )
+                            print("Clicking Next Button")
+                            next_button.click()
+                            time.sleep(1)
+
+                        if len(active_job_reqs) and idx == len(job_title_column) - 1:
+                            active_job_update = company_controller.update_document(
+                                company_id,
+                                {"active_applications": active_job_reqs},
+                            )
+                            if active_job_update:
+                                print(f"{site['name']} active apps updated successfully.")
+                            else:
+                                print("No document found or document was not modified.")
+
+                    # //END active tab iteration
+
+                    # //START inactive tab iteration
+                    if status_tabs and len(status_tabs):
+                        status_tabs[1].click()
+
+                    if int(inactive_apps) > 0:
+                        for i in range(1, inactive_app_upper_limit + 1):
+                            print(f"inactive iteration: {i}")
+                            # time.sleep(2)
+                            inactive_job_title_column = find_elements_by_xpath(
+                                browser, f"//{PARENT_TABPANEL_DIV}//{JOB_TITLE_COLUMN}"
+                            )
+                            inactive_job_req_column = find_elements_by_xpath(
+                                browser, f"//{PARENT_TABPANEL_DIV}//{JOB_REQ_COLUMN}"
+                            )
+                            inactive_status_column = find_elements_by_xpath(
+                                browser, f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}"
+                            )
+                            inactive_date_submitted_column = find_elements_by_xpath(
+                                browser, f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}"
+                            )
+                            for idx, row in enumerate(inactive_job_title_column):
+                                job_title = row.text
+                                job_req_id = inactive_job_req_column[idx].text
+                                job_status = inactive_status_column[idx].text
+                                date_submitted = inactive_date_submitted_column[idx].text
+
+                                job_app = Application(
+                                    company_id,
+                                    job_title,
+                                    job_req_id,
+                                    job_status,
+                                    date_submitted,
+                                    is_active=False,
+                                )
+                                # Insert application
+                                application_to_find = {
+                                    "company_id": company_id,
+                                    "job_req_id": job_req_id,
+                                    "status": job_status,
+                                }
+
+                                inactive_result = applications_controller.find_one_document(
+                                    application_to_find
+                                )
+
+                                inactive_job_reqs.append(job_req_id)
+
+                                if inactive_result is None:
+                                    print("result is None")
+                                    applications_controller.create_document(
+                                        job_app.to_dict()
+                                    )
+                                else:
+                                    print("result is not None")
+                                    if job_status == inactive_result["status"]:
+                                        print("job status' match")
+                                    else:
+                                        applications_controller.update_one_document(
+                                            {
+                                                "company_id": company_id,
+                                                "job_req_id": job_req_id,
+                                            },
+                                            {"$set": {"status": job_status}},
+                                        )
+
+                            time.sleep(2)
+                            print("=====Checking for inactive Pagination=====")
+                            has_pagination = find_elements_by_xpath(
+                                browser, f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}"
+                            )
+                            if not has_pagination:
+                                print("no pagination present")
+                            else:
+                                next_button = (
+                                    find_element_by_xpath(
+                                        browser,
+                                        f"//{PARENT_TABPANEL_DIV}//{PAGINATION_NAV}//{NEXT_BUTTON}",
+                                    )
+                                    if len(has_pagination)
+                                    else False
+                                )
+                                print("Clicking Next Button")
+                                next_button.click()
+                                time.sleep(2)
+
+                            if (
+                                len(inactive_job_reqs)
+                                and idx == len(inactive_job_title_column) - 1
+                            ):
+                                company_controller.update_document(
+                                    company_id,
+                                    {"inactive_applications": inactive_job_reqs},
+                                )
+
+                    # //END active tab iteration
+
+                    time.sleep(2)
 
         except Exception:
             print("Something went wrong")
             traceback.print_exc()
         finally:
             logout(browser)
-            # Click on account settings
-            # account_button = find_element_by_xpath(browser, UTILITY_BUTTON)
-            # time.sleep(3)
-
-            # if account_button:
-            #     account_button.click()
-
-            # time.sleep(3)
-            # Find the Sign Out Button
-            # sign_out_button = find_element_by_xpath(browser, SIGN_OUT_BUTTON)
-            # time.sleep(2)
-            # if sign_out_button:
-            #     sign_out_button.click()
-
-            # time.sleep(2)
-            # browser.close()
 
     # End the timer
     end_time = time.time()

@@ -24,10 +24,18 @@ STATE_SEARCHES = [
     {"north_carolina": "North Carolina"},
     {"florida": "Florida"},
     {"california": "California"},
+    {"remote": "Remote"},
+    {"intern": "Intern"},
+    {"director": "Director"},
+    {"analyst": "Analyst"},
+    {"manager": "Manager"},
+    {"software": "Software"},
+    {"engineer": "Engineer"},
+    {"project": "Project"},
 ]
 
-CLEAR_ALL="//button[@data-automation-id='clearAllButton']"
+CLEAR_ALL = "//button[@data-automation-id='clearAllButton']"
 '<div role="tablist" aria-labelledby="myApplicationsTitle"><button role="tab" '
 
 
-DISTANCE_LOCATION_BUTTON="data-automation-id='distanceLocation'"
+DISTANCE_LOCATION_BUTTON = "data-automation-id='distanceLocation'"
