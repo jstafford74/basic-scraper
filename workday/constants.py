@@ -39,3 +39,11 @@ CLEAR_ALL = "//button[@data-automation-id='clearAllButton']"
 
 
 DISTANCE_LOCATION_BUTTON = "data-automation-id='distanceLocation'"
+
+ORGANIC_SEARCHES=[
+    "Adobe Inc.",
+    "Coca Cola Company",
+    "Millenium",
+    "Qualcomm",
+    "Truist",
+]

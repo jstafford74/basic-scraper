@@ -1,4 +1,5 @@
 SEARCH_FOR_JOBS="//button[@data-automation-id='navigationItem-Search for Jobs']"
+BARCLAYS_SEARCH_FOR_JOBS="//a[@data-automation-id='logoLink']"
 FOUND_JOBS="//p[@data-automation-id='jobFoundText']"
 DISTANCE_LOCATION="//button[@data-automation-id='distanceLocation']"
 CHECKBOX_INPUT_ID="location"

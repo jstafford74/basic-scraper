@@ -1,7 +1,7 @@
 import math
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 
 from bson import ObjectId
 from classes.application import Application
@@ -12,6 +12,7 @@ from constants import (
     JOB_STATUS_COLUMN,
     JOB_TITLE_COLUMN,
     NEXT_BUTTON,
+    ORGANIC_SEARCHES,
     PAGINATION_NAV,
     PARENT_TABPANEL_DIV,
     STATE_SEARCHES,
@@ -19,6 +20,7 @@ from constants import (
 from controllers import ApplicationsController, CompanyController, SnapshotsController
 from dotenv import load_dotenv
 from search import (
+    BARCLAYS_SEARCH_FOR_JOBS,
     FOUND_JOBS,
     KEYWORD_SEARCH_BUTTON,
     KEYWORD_SEARCH_INPUT,
@@ -47,8 +49,8 @@ def workday_scrape(run_search=True, run_apps=True):
     print(f"sites in db: {len(sites_list)}")
     # Start the timer
     start_time = time.time()
-    now = datetime.now()
-    dt_string = now.strftime("%m-%d-%Y")
+
+    current_date = datetime.now(timezone.utc)
 
     for site in sites_list:
         company_id = ObjectId(site["_id"])
@@ -65,12 +67,36 @@ def workday_scrape(run_search=True, run_apps=True):
         # ===============LOGIN===============
         try:
             if run_search:
-                search_jobs = find_element_by_xpath(browser, SEARCH_FOR_JOBS)
+                # print(site)
+                # Get the current date at midnight
+                # today = datetime.now().replace(
+                #     hour=0, minute=0, second=0, microsecond=0
+                # )
 
-                if search_jobs:
-                    print("clicking on search for jobs")
-                    search_jobs.click()
-                    time.sleep(3)
+                # # Create the end of today (optional if necessary for the query)
+                # end_of_today = today + timedelta(days=1)  # Start of tomorrow
+
+                # print(f"today: {today}")
+                # print(f"end of today: {end_of_today}")
+                # # Query to find a snapshot with the current date
+                # snapshot = snapshots_controller.find_one_document(
+                #     {"snapshot_date": {"$gte": today, "$lt": end_of_today}}
+                # )
+                # print(f"snapshot: {snapshot}")
+                # if snapshot is None:
+                    if site["name"] == "Barclays":
+                        search_jobs = find_element_by_xpath(
+                            browser, BARCLAYS_SEARCH_FOR_JOBS
+                        )
+                    if site["name"] in ORGANIC_SEARCHES:
+                        search_jobs = None
+                    else:
+                        search_jobs = find_element_by_xpath(browser, SEARCH_FOR_JOBS)
+
+                    if search_jobs:
+                        print("clicking on search for jobs")
+                        search_jobs.click()
+                        time.sleep(3)
 
                     found_jobs_element = find_element_by_xpath(browser, FOUND_JOBS)
                     total_found_jobs = (
@@ -79,57 +105,43 @@ def workday_scrape(run_search=True, run_apps=True):
                         else 0
                     )
 
-                    total_snapshot_update = snapshots_controller.update_one_document(
+                    total_snapshot_update = snapshots_controller.create_document(
                         {
+                            "total": total_found_jobs,
                             "company_id": company_id,
-                            "snapshot_date": dt_string,
+                            "snapshot_date": current_date,
                         },
-                        {
-                            "$set": {
-                                "total": total_found_jobs,
-                            },
-                        },
-                        upsert=True,
                     )
-
-                    if total_snapshot_update.modified_count > 0:
+                    if total_snapshot_update.acknowledged:
                         print(f"{site['name']} Document updated successfully.")
                     else:
                         print("No document found or document was not modified.")
-
                     keyword_search = find_element_by_xpath(
                         browser, KEYWORD_SEARCH_INPUT
                     )
-
                     if keyword_search:
                         keyword_search_button = find_element_by_xpath(
                             browser, KEYWORD_SEARCH_BUTTON
                         )
-
                         for state in STATE_SEARCHES:
                             for key, value in state.items():
                                 keyword_search.click()
                                 keyword_search.clear()
                                 keyword_search.send_keys(value)
                                 time.sleep(2)
-
                                 if keyword_search_button:
                                     keyword_search_button.click()
                                     time.sleep(4)
-
                                 found_jobs_element = find_element_by_xpath(
                                     browser, FOUND_JOBS
                                 )
-
                                 current_found_jobs = extract_integer(
                                     found_jobs_element.text
                                 )
-
                                 current_search_snapshot = (
                                     snapshots_controller.update_one_document(
                                         {
-                                            "company_id": company_id,
-                                            "snapshot_date": dt_string,
+                                            "_id": total_snapshot_update.inserted_id,
                                         },
                                         {
                                             "$set": {key: current_found_jobs},
@@ -137,19 +149,18 @@ def workday_scrape(run_search=True, run_apps=True):
                                         upsert=True,
                                     )
                                 )
-
                                 if current_search_snapshot.acknowledged:
                                     print(f"{site['name']} {key} snapshot updated:")
                                 else:
                                     print(
                                         "No document found or document was not modified."
                                     )
-
                             clear_all_button = find_element_by_xpath(browser, CLEAR_ALL)
                             if clear_all_button:
                                 clear_all_button.click()
                                 time.sleep(2)
-
+                # else:
+                #     print(f"Snapshot already created for today: {site['name']}")
             if site["password"]:
                 # Find the log in elements
                 browser.get(site["url"])
@@ -166,6 +177,9 @@ def workday_scrape(run_search=True, run_apps=True):
                 inactive_app_upper_limit = (
                     math.ceil(int(inactive_apps) / 4) if inactive_apps else 0
                 )
+                print(f"Site: {site['name']}")
+                print(f"Active Tabs: {active_apps}")
+                print(f"Inactive Tabs: {inactive_apps}")
 
                 # //START active tab iteration
                 if run_apps:
@@ -267,7 +281,9 @@ def workday_scrape(run_search=True, run_apps=True):
                                 {"active_applications": active_job_reqs},
                             )
                             if active_job_update:
-                                print(f"{site['name']} active apps updated successfully.")
+                                print(
+                                    f"{site['name']} active apps updated successfully."
+                                )
                             else:
                                 print("No document found or document was not modified.")
 
@@ -291,13 +307,16 @@ def workday_scrape(run_search=True, run_apps=True):
                                 browser, f"//{PARENT_TABPANEL_DIV}//{JOB_STATUS_COLUMN}"
                             )
                             inactive_date_submitted_column = find_elements_by_xpath(
-                                browser, f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}"
+                                browser,
+                                f"//{PARENT_TABPANEL_DIV}//{DATE_SUBMITTED_COLUMN}",
                             )
                             for idx, row in enumerate(inactive_job_title_column):
                                 job_title = row.text
                                 job_req_id = inactive_job_req_column[idx].text
                                 job_status = inactive_status_column[idx].text
-                                date_submitted = inactive_date_submitted_column[idx].text
+                                date_submitted = inactive_date_submitted_column[
+                                    idx
+                                ].text
 
                                 job_app = Application(
                                     company_id,
@@ -314,8 +333,10 @@ def workday_scrape(run_search=True, run_apps=True):
                                     "status": job_status,
                                 }
 
-                                inactive_result = applications_controller.find_one_document(
-                                    application_to_find
+                                inactive_result = (
+                                    applications_controller.find_one_document(
+                                        application_to_find
+                                    )
                                 )
 
                                 inactive_job_reqs.append(job_req_id)

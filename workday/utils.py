@@ -153,7 +153,8 @@ def find_active_and_inactive_tabs(browser, site):
     dt_string = now.strftime("%m-%d-%Y")
     company_id = ObjectId(site["_id"])
     application_status_controller = ApplicationStatusController()
-
+    print("find_active_and_inactive_tabs")
+    print(site)
     status_tabs = find_elements_by_xpath(browser, STATUS_TABS_SECTION)
 
     active_button_text = (
